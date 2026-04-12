@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comic Library Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f8ff;color:#1f2937;}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px 18px 48px;}
+    .card{background:#fff;border-radius:24px;box-shadow:0 12px 30px rgba(36,65,110,.12);padding:20px;margin-bottom:18px;}
+    h1{margin:0 0 8px;font-size:2.2rem;} .muted{color:#64748b;}
+    input, button, select{padding:12px 14px;border-radius:14px;border:2px solid #e5efff;font-size:1rem;}
+    input{width:100%;} button{cursor:pointer;background:#5b8def;color:#fff;border:none;font-weight:700;}
+    .row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;}
+    table{width:100%;border-collapse:collapse;} th, td{text-align:left;padding:12px 10px;border-bottom:1px solid #eaeef7;vertical-align:top;}
+    th{font-size:.92rem;color:#64748b;} .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;font-weight:700;}
+    .new{background:#fff4d6;} .done{background:#e8fff1;} .msg{margin-top:12px;font-weight:700;} .hidden{display:none;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Owner Admin</h1>
+    <p class="muted">Log in with your owner account to view and update requests.</p>
+    <div id="loginSection">
+      <div class="row">
+        <div><label>Email</label><input id="email" type="email" placeholder="Owner email"></div>
+        <div><label>Password</label><input id="password" type="password" placeholder="Password"></div>
+        <div><button id="loginBtn">Log in</button></div>
+      </div>
+      <div id="loginMsg" class="msg"></div>
+    </div>
+    <div id="sessionSection" class="hidden">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+        <div><b id="userEmail"></b><div class="muted">Signed in</div></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button id="refreshBtn" style="background:#ff8a00;">Refresh</button>
+          <button id="logoutBtn" style="background:#334155;">Log out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="requestsCard" class="card hidden">
+    <h2 style="margin-top:0;">Requests</h2>
+    <div class="muted" style="margin-bottom:10px;">New requests from the public website appear here.</div>
+    <div style="overflow:auto;">
+      <table id="requestsTable">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Book</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="tableMsg" class="msg"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://yhpxfcoqoobpcmksuhso.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlocHhmY29xb29icGNta3N1aHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMDA2MjMsImV4cCI6MjA5MTU3NjYyM30.qvnqyFov5VfItaCtLYwPae5wEcU9rIJROrifglKwaPA";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("loginMsg");
+  msg.textContent = "";
+  if (!email || !password) {
+    msg.textContent = "Enter email and password.";
+    msg.style.color = "#e5484d";
+    return;
+  }
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    msg.textContent = error.message;
+    msg.style.color = "#e5484d";
+    return;
+  }
+  msg.textContent = "";
+  await checkSession();
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  await checkSession();
+}
+
+async function checkSession() {
+  const { data } = await supabaseClient.auth.getSession();
+  const session = data.session;
+  const loginSection = document.getElementById("loginSection");
+  const sessionSection = document.getElementById("sessionSection");
+  const requestsCard = document.getElementById("requestsCard");
+  if (session) {
+    loginSection.classList.add("hidden");
+    sessionSection.classList.remove("hidden");
+    requestsCard.classList.remove("hidden");
+    document.getElementById("userEmail").textContent = session.user.email;
+    loadRequests();
+  } else {
+    loginSection.classList.remove("hidden");
+    sessionSection.classList.add("hidden");
+    requestsCard.classList.add("hidden");
+  }
+}
+
+function statusPill(status) {
+  const cls = status === "Done" ? "pill done" : "pill new";
+  return `<span class="${cls}">${status}</span>`;
+}
+
+async function loadRequests() {
+  const msg = document.getElementById("tableMsg");
+  msg.textContent = "Loading requests...";
+  const tbody = document.querySelector("#requestsTable tbody");
+  tbody.innerHTML = "";
+  const { data, error } = await supabaseClient
+    .from("requests")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    msg.textContent = error.message;
+    msg.style.color = "#e5484d";
+    return;
+  }
+  if (!data.length) {
+    msg.textContent = "No requests yet.";
+    msg.style.color = "#64748b";
+    return;
+  }
+  msg.textContent = "";
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(row.created_at).toLocaleString()}</td>
+      <td><b>${row.book_title || ""}</b></td>
+      <td>${row.requester_name || ""}</td>
+      <td>${row.contact || ""}</td>
+      <td>${row.message || ""}</td>
+      <td>${statusPill(row.status || "New")}</td>
+      <td>
+        <select data-id="${row.id}">
+          <option value="New" ${(row.status||"New")==="New"?"selected":""}>New</option>
+          <option value="Done" ${row.status==="Done"?"selected":""}>Done</option>
+        </select>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll("select").forEach(sel => {
+    sel.addEventListener("change", async (e) => {
+      const id = e.target.getAttribute("data-id");
+      const status = e.target.value;
+      const { error } = await supabaseClient.from("requests").update({ status }).eq("id", id);
+      if (error) {
+        alert("Could not update status");
+        console.error(error);
+      } else {
+        loadRequests();
+      }
+    });
+  });
+}
+
+document.getElementById("loginBtn").addEventListener("click", login);
+document.getElementById("logoutBtn").addEventListener("click", logout);
+document.getElementById("refreshBtn").addEventListener("click", loadRequests);
+checkSession();
+</script>
+</body>
+</html>
