@@ -249,7 +249,7 @@ document.getElementById("closeBtn2").addEventListener("click", closeModal);
 document.getElementById("submitRequestBtn").addEventListener("click", submitRequest);
 document.getElementById("modal").addEventListener("click", (e) => { if(e.target.id === "modal") closeModal(); });
 
-Papa.parse("https://raw.githubusercontent.com/artyom-r/books/main/books.csv", {
+Papa.parse("books.csv", {
   download: true,
   header: true,
   skipEmptyLines: true,
