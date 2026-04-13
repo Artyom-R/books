@@ -19,6 +19,7 @@
       --primary-hover: #1d4ed8;
       --danger: #dc2626;
       --success: #059669;
+      --warning: #b45309;
       --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       --radius: 14px;
     }
@@ -83,6 +84,12 @@
       margin: 10px 0 0;
       font-size: 14px;
       color: var(--muted);
+    }
+
+    .warning-line {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: var(--warning);
     }
 
     .grid {
@@ -295,6 +302,7 @@
     </div>
 
     <p id="statusLine" class="status-line">Loading books...</p>
+    <p id="warningLine" class="warning-line hidden"></p>
 
     <div id="errorState" class="error-state hidden"></div>
     <div id="emptyState" class="empty-state hidden">No books found.</div>
@@ -351,6 +359,7 @@
     const emptyStateEl = document.getElementById('emptyState');
     const errorStateEl = document.getElementById('errorState');
     const statusLineEl = document.getElementById('statusLine');
+    const warningLineEl = document.getElementById('warningLine');
     const searchInputEl = document.getElementById('searchInput');
     const statusFilterEl = document.getElementById('statusFilter');
     const requestModalEl = document.getElementById('requestModal');
@@ -403,61 +412,81 @@
       };
     }
 
-    async function fetchBorrowedBookIds() {
-      const { data, error } = await supabaseClient
-        .from('requests')
-        .select('book_id')
-        .eq('status', 'Done');
+    async function fetchBorrowedBookIdsSafe() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('requests')
+          .select('book_id')
+          .eq('status', 'Done');
 
-      if (error) {
-        console.error('Failed to fetch borrowed books:', error);
-        throw error;
+        if (error) {
+          console.warn('Borrowed-state fetch failed:', error);
+          warningLineEl.textContent = 'Books loaded, but live borrowed status is unavailable right now.';
+          warningLineEl.classList.remove('hidden');
+          return new Set();
+        }
+
+        warningLineEl.classList.add('hidden');
+        warningLineEl.textContent = '';
+
+        return new Set(
+          (data || [])
+            .map(row => String(row.book_id || '').trim())
+            .filter(Boolean)
+        );
+      } catch (err) {
+        console.warn('Borrowed-state fetch failed:', err);
+        warningLineEl.textContent = 'Books loaded, but live borrowed status is unavailable right now.';
+        warningLineEl.classList.remove('hidden');
+        return new Set();
       }
-
-      return new Set(
-        (data || [])
-          .map(row => String(row.book_id || '').trim())
-          .filter(Boolean)
-      );
     }
 
-    async function loadBooks() {
-      try {
-        statusLineEl.textContent = 'Loading books...';
-        errorStateEl.classList.add('hidden');
-        emptyStateEl.classList.add('hidden');
-        bookListEl.innerHTML = '';
-
-        const borrowedBookIds = await fetchBorrowedBookIds();
-
+    function parseBooksCsv() {
+      return new Promise((resolve, reject) => {
         Papa.parse('books.csv', {
           download: true,
           header: true,
           skipEmptyLines: true,
           complete: function(results) {
-            const rows = Array.isArray(results.data) ? results.data : [];
-
-            allBooks = rows
-              .map(normalizeBookRow)
-              .filter(book => book.id && book.title)
-              .map(book => {
-                const finalStatus = borrowedBookIds.has(book.id) ? 'Borrowed' : book.status;
-                return {
-                  ...book,
-                  availability: finalStatus
-                };
-              });
-
-            renderFilteredBooks();
+            resolve(results);
           },
           error: function(err) {
-            console.error('Failed to load books.csv:', err);
-            showError('Failed to load books.csv.');
+            reject(err);
           }
         });
+      });
+    }
+
+    async function loadBooks() {
+      statusLineEl.textContent = 'Loading books...';
+      errorStateEl.classList.add('hidden');
+      emptyStateEl.classList.add('hidden');
+      bookListEl.innerHTML = '';
+
+      try {
+        const [borrowedBookIds, results] = await Promise.all([
+          fetchBorrowedBookIdsSafe(),
+          parseBooksCsv()
+        ]);
+
+        const rows = Array.isArray(results.data) ? results.data : [];
+
+        allBooks = rows
+          .map(normalizeBookRow)
+          .filter(book => book.id && book.title)
+          .map(book => {
+            const finalStatus = borrowedBookIds.has(book.id) ? 'Borrowed' : book.status;
+            return {
+              ...book,
+              availability: finalStatus
+            };
+          });
+
+        renderFilteredBooks();
       } catch (err) {
         console.error('Load error:', err);
-        showError('Failed to load borrowed-book status from Supabase.');
+        showError('Failed to load books.csv. Check that books.csv exists in the same folder as index.html and has headers: id,title,series,volume,status,notes,age,image,location');
       }
     }
 
