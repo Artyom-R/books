@@ -393,7 +393,6 @@
       const title = String(row.title ?? '').trim();
       const series = String(row.series ?? '').trim();
       const volume = String(row.volume ?? '').trim();
-      const status = normalizeStatus(row.status);
       const notes = String(row.notes ?? '').trim();
       const age = String(row.age ?? '').trim();
       const image = String(row.image ?? '').trim();
@@ -476,7 +475,7 @@
           .map(normalizeBookRow)
           .filter(book => book.id && book.title)
           .map(book => {
-            const finalStatus = borrowedBookIds.has(book.id) ? 'Borrowed' : book.status;
+            const finalStatus = borrowedBookIds.has(book.id) ? 'Borrowed' : 'Available';
             return {
               ...book,
               availability: finalStatus
