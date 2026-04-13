@@ -1,19 +1,13 @@
 id,title,series/author,volume,notes,age,image
-B001,Spider-Man Vol.1,Marvel Comics,1,Funny comic with lots of action,8+,images/spiderman.jpg
-B002,Batman Begins,DC Comics,2,Dark hero story with gadgets and crime fighting,8+,images/batman.jpg
-B003,Pokemon Adventure,Pokemon,3,Great for kids who love Pokemon adventures,6+,images/pokemon.jpg
-B004,Avengers Team-Up,Marvel Comics,4,Big team battles and easy reading,9+,images/avengers.jpg
-B005,Doraemon Fun Day,Kodansha,5,Light and funny story about Doraemon gadgets,6+,images/doraemon.jpg
-B006,Naruto Starter,Shonen Jump,1,Ninja adventures and friendship story,7+,images/naruto.jpg
-B007,Ghost Book,Remy Lai,1,Adventure with ghosts and magical world,8+,images/ghostbook.jpg
-B008,The Amazing Voyage,Geronimo Stilton Kingdom of Fantasy,3,Fantasy journey with puzzles and adventures,7+,images/kof3.jpg
-B009,The Kingdom of Fantasy,Geronimo Stilton Kingdom of Fantasy,1,First magical adventure in fantasy world,7+,images/kof1.jpg
-B010,The Volcano of Fire,Geronimo Stilton Kingdom of Fantasy,5,Adventure through dangerous volcano lands,7+,images/kof5.jpg
-B011,The Wizard's Wand,Geronimo Stilton Kingdom of Fantasy,9,Quest to find a powerful magical wand,7+,images/kof9.jpg
-B012,The Ship of Secrets,Geronimo Stilton Kingdom of Fantasy,10,Sea adventure with mysteries and secrets,7+,images/kof10.jpg
-B013,The Island of Dragons,Geronimo Stilton Kingdom of Fantasy,12,Dragon island adventure and fantasy battles,7+,images/kof12.jpg
-B014,Ghost,Raina Telgemeier,1,Graphic novel about friendship and mystery,9+,images/ghost_raina.jpg
-B015,Guts,Raina Telgemeier,1,Story about anxiety and growing up,10+,images/guts.jpg
-B016,Sisters,Raina Telgemeier,1,Sibling relationship and family story,9+,images/sisters.jpg
-B017,Drama,Raina Telgemeier,1,School life and theater story,10+,images/drama.jpg
-B018,Smile,Raina Telgemeier,1,Coming-of-age story with humor,9+,images/smile.jpg
+B001,Ghost Book,Remy Lai,1,Adventure with ghosts and magical world,8+,images/ghostbook.jpg
+B002,The Amazing Voyage,Geronimo Stilton Kingdom of Fantasy,3,Fantasy journey with puzzles and adventures,7+,images/kof3.jpg
+B003,The Kingdom of Fantasy,Geronimo Stilton Kingdom of Fantasy,1,First magical adventure in fantasy world,7+,images/kof1.jpg
+B04,The Volcano of Fire,Geronimo Stilton Kingdom of Fantasy,5,Adventure through dangerous volcano lands,7+,images/kof5.jpg
+B05,The Wizard's Wand,Geronimo Stilton Kingdom of Fantasy,9,Quest to find a powerful magical wand,7+,images/kof9.jpg
+B06,The Ship of Secrets,Geronimo Stilton Kingdom of Fantasy,10,Sea adventure with mysteries and secrets,7+,images/kof10.jpg
+B07,The Island of Dragons,Geronimo Stilton Kingdom of Fantasy,12,Dragon island adventure and fantasy battles,7+,images/kof12.jpg
+B08,Ghost,Raina Telgemeier,1,Graphic novel about friendship and mystery,9+,images/ghost_raina.jpg
+B09,Guts,Raina Telgemeier,1,Story about anxiety and growing up,10+,images/guts.jpg
+B010,Sisters,Raina Telgemeier,1,Sibling relationship and family story,9+,images/sisters.jpg
+B011,Drama,Raina Telgemeier,1,School life and theater story,10+,images/drama.jpg
+B012,Smile,Raina Telgemeier,1,Coming-of-age story with humor,9+,images/smile.jpg
