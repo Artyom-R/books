@@ -206,38 +206,49 @@ async function submitRequest() {
   const statusEl = document.getElementById("requestStatus");
   statusEl.textContent = "";
   statusEl.className = "small";
+
   if (!currentBook) {
     statusEl.textContent = "No comic selected.";
     statusEl.classList.add("error");
     return;
   }
+
   const requester_name = document.getElementById("reqName").value.trim();
   const contact = document.getElementById("reqContact").value.trim();
   const message = document.getElementById("reqMessage").value.trim();
+
   if (!requester_name) {
     statusEl.textContent = "Please enter your name.";
     statusEl.classList.add("error");
     return;
   }
+
   statusEl.textContent = "Sending request...";
+
   try {
-    const { error } = await supabaseClient.from("requests").insert([{
-      book_title: currentBook.title,
-      requester_name,
-      contact,
-      message,
-      status: "New"
-    }]);
-    if (error) throw error;
+    const { error } = await supabaseClient.rpc("submit_request", {
+      p_book_title: currentBook.title,
+      p_requester_name: requester_name,
+      p_contact: contact,
+      p_message: message
+    });
+
+    if (error) {
+      console.error(error);
+      statusEl.textContent = "Could not save request. Please try again.";
+      statusEl.classList.add("error");
+      return;
+    }
+
     statusEl.textContent = "Request sent! The owner can now see it in the admin page.";
     statusEl.classList.add("success");
     document.getElementById("reqName").value = "";
     document.getElementById("reqContact").value = "";
     document.getElementById("reqMessage").value = "";
   } catch (err) {
+    console.error(err);
     statusEl.textContent = "Could not save request. Please try again.";
     statusEl.classList.add("error");
-    console.error(err);
   }
 }
 
