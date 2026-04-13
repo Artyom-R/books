@@ -3,287 +3,641 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Artyom’s Comic Library</title>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <title>Comic Library</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <style>
-    :root{
-      --bg1:#f7fbff; --bg2:#eef6ff; --card:#fff; --ink:#1f2937; --muted:#64748b;
-      --accent:#ff8a00; --accent2:#5b8def; --ok:#18a957; --bad:#e5484d; --pill:#eef2ff;
-      --shadow:0 12px 30px rgba(36,65,110,.12); --radius:22px;
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --success: #059669;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --radius: 14px;
     }
-    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);
-      background:radial-gradient(circle at top left,#fff7cc 0,transparent 26%),radial-gradient(circle at top right,#dff3ff 0,transparent 25%),linear-gradient(180deg,var(--bg1),var(--bg2));min-height:100vh;}
-    .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 48px;}
-    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center;padding:28px 0 22px;}
-    .hero-card{background:rgba(255,255,255,.78);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.5);border-radius:28px;box-shadow:var(--shadow);padding:26px;}
-    h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.4rem);line-height:1.02;} .sub{margin:0;color:var(--muted);font-size:1.05rem;line-height:1.5;}
-    .burst{display:inline-block;background:#fff;color:var(--accent2);border:3px solid var(--accent2);border-radius:999px;padding:8px 14px;font-weight:700;margin-bottom:12px;transform:rotate(-4deg);}
-    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;} .stat{background:#fff;padding:12px 14px;border-radius:18px;box-shadow:var(--shadow);min-width:120px;} .stat b{display:block;font-size:1.3rem;}
-    .panel{background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:18px;}
-    .controls{display:grid;grid-template-columns:1.2fr .7fr .7fr;gap:12px;margin:12px 0 22px;}
-    input, select, textarea{width:100%;padding:14px 16px;border-radius:16px;border:2px solid #e8eefc;outline:none;font-size:1rem;background:#fff;}
-    input:focus, select:focus, textarea:focus{border-color:#aac7ff;box-shadow:0 0 0 4px rgba(91,141,239,.12);}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;}
-    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:transform .18s ease, box-shadow .18s ease;cursor:pointer;}
-    .card:hover{transform:translateY(-4px) scale(1.01);} .cover{aspect-ratio:2/3;width:100%;object-fit:cover;display:block;background:#dbeafe;}
-    .card-body{padding:14px 14px 16px;} .title{font-size:1.02rem;font-weight:700;margin:0 0 6px;line-height:1.25;min-height:2.5em;}
-    .meta{color:var(--muted);font-size:.92rem;margin-bottom:10px;} .row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-    .badge{display:inline-block;border-radius:999px;padding:7px 10px;font-size:.83rem;font-weight:700;} .available{background:#e8fff1;color:var(--ok);} .borrowed{background:#ffecee;color:var(--bad);}
-    .chip{font-size:.8rem;background:var(--pill);color:#4a5a7a;padding:6px 10px;border-radius:999px;font-weight:700;}
-    .empty{text-align:center;padding:30px;color:var(--muted);background:#fff;border-radius:24px;box-shadow:var(--shadow);}
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(13,23,42,.48);padding:18px;z-index:20;}
-    .modal.show{display:flex;} .dialog{width:min(960px,100%);background:#fff;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;display:grid;grid-template-columns:1fr 1.1fr;position:relative;}
-    .dialog img{width:100%;height:100%;object-fit:cover;background:#dbeafe;} .dialog-body{padding:24px;} .dialog h2{margin:0 0 8px;font-size:1.8rem;} .dialog p{color:var(--muted);line-height:1.55;}
-    .dialog .topline{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;} .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
-    .btn{appearance:none;border:none;cursor:pointer;border-radius:16px;padding:14px 16px;font-weight:700;font-size:1rem;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
-    .btn-primary{background:linear-gradient(135deg,var(--accent),#ffb100);color:#fff;} .btn-secondary{background:#eef4ff;color:#35528d;}
-    .close{position:absolute;top:14px;right:14px;background:#fff;border:none;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.2rem;box-shadow:var(--shadow);z-index:2;}
-    .request-form{margin-top:18px;padding:16px;background:#f8fbff;border:1px solid #e5efff;border-radius:20px;}
-    .request-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;} .request-form h3{margin:0 0 12px;}
-    .small{font-size:.9rem;color:var(--muted);} .success{color:var(--ok);font-weight:700;} .error{color:var(--bad);font-weight:700;}
-    footer{text-align:center;color:var(--muted);font-size:.95rem;margin-top:26px;}
-    @media (max-width: 820px){.hero,.dialog,.request-grid{grid-template-columns:1fr;} .dialog img{max-height:360px;}}
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 24px 16px;
+    }
+
+    .header-inner,
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .status-line {
+      margin: 10px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+      padding-bottom: 40px;
+    }
+
+    .book-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .book-image-wrap {
+      background: #f3f4f6;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .book-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .book-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .book-meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .book-notes {
+      margin: 0;
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .book-status {
+      display: inline-block;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .book-status.available {
+      background: #ecfdf5;
+      color: var(--success);
+    }
+
+    .book-status.borrowed {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .request-btn {
+      margin-top: auto;
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .request-btn:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .request-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .empty-state,
+    .error-state {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: 16px 18px;
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 0;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .helper {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <div class="hero-card">
-        <div class="burst">POW! ZAP! BOOM!</div>
-        <h1>Artyom’s Comic Library 📚</h1>
-        <p class="sub">Pick a comic, check if it is available, and send a request to borrow it. Parent approval required for all requests.</p>
-        <div class="stats">
-          <div class="stat"><b id="statTotal">0</b><span>Total comics</span></div>
-          <div class="stat"><b id="statAvail">0</b><span>Available now</span></div>
-          <div class="stat"><b id="statBorrowed">0</b><span>Borrowed</span></div>
-        </div>
+  <header>
+    <div class="header-inner">
+      <h1>Comic Library</h1>
+      <p class="subtitle">Browse the collection and submit a borrowing request.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="toolbar">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search by title, series, notes, location, age or id"
+      />
+      <select id="statusFilter">
+        <option value="all">All books</option>
+        <option value="available">Available</option>
+        <option value="borrowed">Borrowed</option>
+      </select>
+    </div>
+
+    <p id="statusLine" class="status-line">Loading books...</p>
+
+    <div id="errorState" class="error-state hidden"></div>
+    <div id="emptyState" class="empty-state hidden">No books found.</div>
+    <div id="bookList" class="grid"></div>
+  </main>
+
+  <div id="requestModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
+      <div class="modal-header">
+        <h2 id="requestModalTitle" style="margin:0; font-size:20px;">Request Book</h2>
+        <p id="requestBookTitle" style="margin:8px 0 0; color:#6b7280;"></p>
       </div>
-      <div class="panel">
-        <h3 style="margin:4px 0 12px;">Find your next read</h3>
-        <div class="controls">
-          <input id="searchInput" type="text" placeholder="Search by title or series">
-          <select id="seriesFilter"><option value="">All series</option></select>
-          <select id="statusFilter">
-            <option value="">All status</option>
-            <option value="Available">Available</option>
-            <option value="Borrowed">Borrowed</option>
-          </select>
-        </div>
-        <div style="color:var(--muted);font-size:.95rem;">Tip: update <b>books.csv</b> in Excel, then upload the new CSV to GitHub.</div>
-      </div>
-    </section>
 
-    <section id="grid" class="grid"></section>
-    <div id="emptyState" class="empty" style="display:none;">No comics matched your search.</div>
+      <form id="requestForm">
+        <div class="modal-body">
+          <div style="display:grid; gap:12px;">
+            <div>
+              <label for="requester_name">Your name</label>
+              <input type="text" id="requester_name" name="requester_name" required />
+            </div>
 
-    <footer>
-      Built for sharing comics with friends • Owner view: <a href="admin.html">admin.html</a>
-    </footer>
-  </div>
+            <div>
+              <label for="contact">Contact</label>
+              <input type="text" id="contact" name="contact" required placeholder="Email or phone" />
+            </div>
 
-  <div id="modal" class="modal" aria-hidden="true">
-    <div class="dialog">
-      <button id="closeBtn" class="close" aria-label="Close">✕</button>
-      <div><img id="modalImage" src="" alt=""></div>
-      <div class="dialog-body">
-        <div class="topline">
-          <span id="modalStatus" class="badge">Available</span>
-          <span id="modalSeries" class="chip"></span>
-          <span id="modalAge" class="chip"></span>
-          <span id="modalLocation" class="chip"></span>
-        </div>
-        <h2 id="modalTitle"></h2>
-        <p id="modalMeta"></p>
-        <p id="modalNotes"></p>
-
-        <div class="request-form">
-          <h3>Request this comic</h3>
-          <div class="request-grid">
-            <input id="reqName" type="text" placeholder="Your name">
-            <input id="reqContact" type="text" placeholder="Contact (email / phone)">
+            <div>
+              <label for="message">Message</label>
+              <textarea id="message" name="message" placeholder="Optional note"></textarea>
+              <div class="helper">Your request will be reviewed by the admin.</div>
+            </div>
           </div>
-          <textarea id="reqMessage" rows="4" placeholder="Message (optional)"></textarea>
-          <div class="cta-row">
-            <button id="submitRequestBtn" class="btn btn-primary">📖 Send request</button>
-            <button id="closeBtn2" class="btn btn-secondary">Back to library</button>
-          </div>
-          <div id="requestStatus" class="small" style="margin-top:12px;"></div>
         </div>
-      </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelRequestBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitRequestBtn">Submit Request</button>
+        </div>
+      </form>
     </div>
   </div>
 
-<script>
-const SUPABASE_URL = "https://yhpxfcoqoobpcmksuhso.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlocHhmY29xb29icGNta3N1aHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMDA2MjMsImV4cCI6MjA5MTU3NjYyM30.qvnqyFov5VfItaCtLYwPae5wEcU9rIJROrifglKwaPA";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script>
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-let books = [];
-let filteredBooks = [];
-let currentBook = null;
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function escapeHTML(str='') {
-  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-}
-function normalizeStatus(status='') {
-  const s = String(status).trim().toLowerCase();
-  return s === 'borrowed' ? 'Borrowed' : 'Available';
-}
-function updateStats(list) {
-  document.getElementById("statTotal").textContent = list.length;
-  document.getElementById("statAvail").textContent = list.filter(b => b.status === "Available").length;
-  document.getElementById("statBorrowed").textContent = list.filter(b => b.status === "Borrowed").length;
-}
-function buildSeriesFilter(list) {
-  const select = document.getElementById("seriesFilter");
-  const current = select.value;
-  const series = [...new Set(list.map(b => b.series).filter(Boolean))].sort();
-  select.innerHTML = '<option value="">All series</option>' + series.map(s => `<option value="${escapeHTML(s)}">${escapeHTML(s)}</option>`).join('');
-  if (series.includes(current)) select.value = current;
-}
-function renderCards(list) {
-  const grid = document.getElementById("grid");
-  const empty = document.getElementById("emptyState");
-  grid.innerHTML = "";
-  if(!list.length) { empty.style.display = "block"; return; }
-  empty.style.display = "none";
-  list.forEach(book => {
-    const card = document.createElement("article");
-    card.className = "card";
-    card.innerHTML = `
-      <img class="cover" src="${escapeHTML(book.image || '')}" alt="${escapeHTML(book.title)} cover">
-      <div class="card-body">
-        <h3 class="title">${escapeHTML(book.title)}</h3>
-        <div class="meta">${escapeHTML(book.series)} • Vol. ${escapeHTML(book.volume)}</div>
-        <div class="row">
-          <span class="badge ${book.status === 'Available' ? 'available' : 'borrowed'}">${escapeHTML(book.status)}</span>
-          <span class="chip">${escapeHTML(book.location || 'Shelf')}</span>
-        </div>
-      </div>`;
-    card.addEventListener("click", () => openModal(book));
-    grid.appendChild(card);
-  });
-}
-function applyFilters() {
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  const series = document.getElementById("seriesFilter").value;
-  const status = document.getElementById("statusFilter").value;
-  filteredBooks = books.filter(book => {
-    const matchesQ = !q || (book.title + " " + book.series).toLowerCase().includes(q);
-    const matchesSeries = !series || book.series === series;
-    const matchesStatus = !status || book.status === status;
-    return matchesQ && matchesSeries && matchesStatus;
-  });
-  renderCards(filteredBooks);
-}
-function openModal(book) {
-  currentBook = book;
-  document.getElementById("modalImage").src = book.image || "";
-  document.getElementById("modalImage").alt = book.title + " cover";
-  document.getElementById("modalTitle").textContent = book.title;
-  document.getElementById("modalSeries").textContent = book.series || "Series";
-  document.getElementById("modalAge").textContent = book.age ? (book.age + " ages") : "Kids";
-  document.getElementById("modalLocation").textContent = book.location || "Shelf";
-  document.getElementById("modalMeta").textContent = `Volume ${book.volume} • ${book.status}`;
-  document.getElementById("modalNotes").textContent = book.notes || "No notes yet.";
-  const badge = document.getElementById("modalStatus");
-  badge.textContent = book.status;
-  badge.className = "badge " + (book.status === "Available" ? "available" : "borrowed");
-  document.getElementById("reqName").value = "";
-  document.getElementById("reqContact").value = "";
-  document.getElementById("reqMessage").value = "";
-  const requestStatus = document.getElementById("requestStatus");
-  requestStatus.textContent = "";
-  requestStatus.className = "small";
-  document.getElementById("modal").classList.add("show");
-}
-function closeModal() {
-  document.getElementById("modal").classList.remove("show");
-  currentBook = null;
-}
-async function submitRequest() {
-  const statusEl = document.getElementById("requestStatus");
-  statusEl.textContent = "";
-  statusEl.className = "small";
+    let allBooks = [];
+    let selectedBookId = '';
+    let selectedBookTitle = '';
 
-  if (!currentBook) {
-    statusEl.textContent = "No comic selected.";
-    statusEl.classList.add("error");
-    return;
-  }
+    const bookListEl = document.getElementById('bookList');
+    const emptyStateEl = document.getElementById('emptyState');
+    const errorStateEl = document.getElementById('errorState');
+    const statusLineEl = document.getElementById('statusLine');
+    const searchInputEl = document.getElementById('searchInput');
+    const statusFilterEl = document.getElementById('statusFilter');
+    const requestModalEl = document.getElementById('requestModal');
+    const requestBookTitleEl = document.getElementById('requestBookTitle');
+    const requestFormEl = document.getElementById('requestForm');
+    const submitRequestBtnEl = document.getElementById('submitRequestBtn');
+    const cancelRequestBtnEl = document.getElementById('cancelRequestBtn');
 
-  const requester_name = document.getElementById("reqName").value.trim();
-  const contact = document.getElementById("reqContact").value.trim();
-  const message = document.getElementById("reqMessage").value.trim();
-
-  if (!requester_name) {
-    statusEl.textContent = "Please enter your name.";
-    statusEl.classList.add("error");
-    return;
-  }
-
-  statusEl.textContent = "Sending request...";
-
-  try {
-    const { error } = await supabaseClient.rpc("submit_request", {
-      p_book_title: currentBook.title,
-      p_requester_name: requester_name,
-      p_contact: contact,
-      p_message: message
-    });
-
-    if (error) {
-      console.error(error);
-      statusEl.textContent = "Could not save request. Please try again.";
-      statusEl.classList.add("error");
-      return;
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
     }
 
-    statusEl.textContent = "Request sent! The owner can now see it in the admin page.";
-    statusEl.classList.add("success");
-    document.getElementById("reqName").value = "";
-    document.getElementById("reqContact").value = "";
-    document.getElementById("reqMessage").value = "";
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = "Could not save request. Please try again.";
-    statusEl.classList.add("error");
-  }
-}
+    function escapeJs(value) {
+      return String(value ?? '')
+        .replaceAll('\\', '\\\\')
+        .replaceAll("'", "\\'");
+    }
 
-document.getElementById("searchInput").addEventListener("input", applyFilters);
-document.getElementById("seriesFilter").addEventListener("change", applyFilters);
-document.getElementById("statusFilter").addEventListener("change", applyFilters);
-document.getElementById("closeBtn").addEventListener("click", closeModal);
-document.getElementById("closeBtn2").addEventListener("click", closeModal);
-document.getElementById("submitRequestBtn").addEventListener("click", submitRequest);
-document.getElementById("modal").addEventListener("click", (e) => { if(e.target.id === "modal") closeModal(); });
+    function normalizeStatus(value) {
+      const s = String(value || '').trim().toLowerCase();
+      return s === 'borrowed' ? 'Borrowed' : 'Available';
+    }
 
-Papa.parse("books.csv", {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  complete: function(results) {
-    books = results.data.map(row => ({
-      title: (row.title || "").trim(),
-      series: (row.series || "").trim(),
-      volume: (row.volume || "").trim(),
-      status: normalizeStatus(row.status || ""),
-      notes: (row.notes || "").trim(),
-      image: (row.image || "").trim(),
-      age: (row.age || "").trim(),
-      location: (row.location || "").trim()
-    })).filter(b => b.title);
-    updateStats(books);
-    buildSeriesFilter(books);
-    applyFilters();
-  },
-  error: function(err) {
-    document.getElementById("grid").innerHTML = '<div class="empty">Could not load books.csv.</div>';
-    console.error(err);
-  }
-});
-</script>
+    function normalizeBookRow(row) {
+      const id = String(row.id ?? '').trim();
+      const title = String(row.title ?? '').trim();
+      const series = String(row.series ?? '').trim();
+      const volume = String(row.volume ?? '').trim();
+      const status = normalizeStatus(row.status);
+      const notes = String(row.notes ?? '').trim();
+      const age = String(row.age ?? '').trim();
+      const image = String(row.image ?? '').trim();
+      const location = String(row.location ?? '').trim();
+
+      return {
+        id,
+        title,
+        series,
+        volume,
+        status,
+        notes,
+        age,
+        image,
+        location
+      };
+    }
+
+    async function fetchBorrowedBookIds() {
+      const { data, error } = await supabaseClient
+        .from('requests')
+        .select('book_id')
+        .eq('status', 'Done');
+
+      if (error) {
+        console.error('Failed to fetch borrowed books:', error);
+        throw error;
+      }
+
+      return new Set(
+        (data || [])
+          .map(row => String(row.book_id || '').trim())
+          .filter(Boolean)
+      );
+    }
+
+    async function loadBooks() {
+      try {
+        statusLineEl.textContent = 'Loading books...';
+        errorStateEl.classList.add('hidden');
+        emptyStateEl.classList.add('hidden');
+        bookListEl.innerHTML = '';
+
+        const borrowedBookIds = await fetchBorrowedBookIds();
+
+        Papa.parse('books.csv', {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            const rows = Array.isArray(results.data) ? results.data : [];
+
+            allBooks = rows
+              .map(normalizeBookRow)
+              .filter(book => book.id && book.title)
+              .map(book => {
+                const finalStatus = borrowedBookIds.has(book.id) ? 'Borrowed' : book.status;
+                return {
+                  ...book,
+                  availability: finalStatus
+                };
+              });
+
+            renderFilteredBooks();
+          },
+          error: function(err) {
+            console.error('Failed to load books.csv:', err);
+            showError('Failed to load books.csv.');
+          }
+        });
+      } catch (err) {
+        console.error('Load error:', err);
+        showError('Failed to load borrowed-book status from Supabase.');
+      }
+    }
+
+    function renderFilteredBooks() {
+      const search = searchInputEl.value.trim().toLowerCase();
+      const filter = statusFilterEl.value;
+
+      const filtered = allBooks.filter(book => {
+        const haystack = [
+          book.id,
+          book.title,
+          book.series,
+          book.volume,
+          book.notes,
+          book.age,
+          book.location
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = !search || haystack.includes(search);
+
+        const matchesFilter =
+          filter === 'all' ||
+          (filter === 'available' && book.availability === 'Available') ||
+          (filter === 'borrowed' && book.availability === 'Borrowed');
+
+        return matchesSearch && matchesFilter;
+      });
+
+      renderBooks(filtered, allBooks.length);
+    }
+
+    function renderBooks(books, totalCount) {
+      bookListEl.innerHTML = '';
+      errorStateEl.classList.add('hidden');
+
+      if (!allBooks.length) {
+        statusLineEl.textContent = 'No books loaded.';
+        emptyStateEl.classList.remove('hidden');
+        return;
+      }
+
+      statusLineEl.textContent = `Showing ${books.length} of ${totalCount} books`;
+      emptyStateEl.classList.toggle('hidden', books.length > 0);
+
+      if (!books.length) return;
+
+      bookListEl.innerHTML = books.map(renderBookCard).join('');
+    }
+
+    function renderBookCard(book) {
+      const isBorrowed = book.availability === 'Borrowed';
+      const imageSrc = book.image || '';
+
+      return `
+        <div class="book-card">
+          <div class="book-image-wrap">
+            ${
+              imageSrc
+                ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(book.title)}" loading="lazy" />`
+                : `<div style="padding:16px; color:#6b7280;">No image</div>`
+            }
+          </div>
+
+          <div class="book-body">
+            <h3 class="book-title">${escapeHtml(book.title)}</h3>
+            <p class="book-meta">Series: ${escapeHtml(book.series || '-')}</p>
+            <p class="book-meta">Volume: ${escapeHtml(book.volume || '-')}</p>
+            <p class="book-meta">Age: ${escapeHtml(book.age || '-')}</p>
+            <p class="book-meta">Location: ${escapeHtml(book.location || '-')}</p>
+            <p class="book-meta">ID: ${escapeHtml(book.id)}</p>
+            ${book.notes ? `<p class="book-notes">${escapeHtml(book.notes)}</p>` : ''}
+
+            <span class="book-status ${isBorrowed ? 'borrowed' : 'available'}">
+              ${escapeHtml(book.availability)}
+            </span>
+
+            <button
+              class="request-btn"
+              ${isBorrowed ? 'disabled' : ''}
+              onclick="openRequestModal('${escapeJs(book.id)}', '${escapeJs(book.title)}')"
+            >
+              ${isBorrowed ? 'Unavailable' : 'Request'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      errorStateEl.textContent = message;
+      errorStateEl.classList.remove('hidden');
+      emptyStateEl.classList.add('hidden');
+      statusLineEl.textContent = 'Error';
+    }
+
+    function openRequestModal(bookId, bookTitle) {
+      selectedBookId = String(bookId || '').trim();
+      selectedBookTitle = String(bookTitle || '').trim();
+
+      if (!selectedBookId || !selectedBookTitle) {
+        alert('Invalid book selection.');
+        return;
+      }
+
+      requestBookTitleEl.textContent = `${selectedBookTitle} (${selectedBookId})`;
+      requestModalEl.style.display = 'flex';
+      requestModalEl.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeRequestModal() {
+      requestFormEl.reset();
+      selectedBookId = '';
+      selectedBookTitle = '';
+      requestBookTitleEl.textContent = '';
+      requestModalEl.style.display = 'none';
+      requestModalEl.setAttribute('aria-hidden', 'true');
+    }
+
+    async function submitRequest(event) {
+      event.preventDefault();
+
+      const requesterName = document.getElementById('requester_name').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!selectedBookId || !selectedBookTitle) {
+        alert('No book selected.');
+        return;
+      }
+
+      if (!requesterName || !contact) {
+        alert('Please complete all required fields.');
+        return;
+      }
+
+      submitRequestBtnEl.disabled = true;
+      submitRequestBtnEl.textContent = 'Submitting...';
+
+      try {
+        const { error } = await supabaseClient.rpc('submit_request', {
+          p_book_id: selectedBookId,
+          p_book_title: selectedBookTitle,
+          p_requester_name: requesterName,
+          p_contact: contact,
+          p_message: message
+        });
+
+        if (error) {
+          console.error('RPC error:', error);
+          alert('Could not save request. Please try again.');
+          return;
+        }
+
+        alert('Request submitted successfully.');
+        closeRequestModal();
+      } catch (err) {
+        console.error('Unexpected submit error:', err);
+        alert('Could not save request. Please try again.');
+      } finally {
+        submitRequestBtnEl.disabled = false;
+        submitRequestBtnEl.textContent = 'Submit Request';
+      }
+    }
+
+    searchInputEl.addEventListener('input', renderFilteredBooks);
+    statusFilterEl.addEventListener('change', renderFilteredBooks);
+    requestFormEl.addEventListener('submit', submitRequest);
+    cancelRequestBtnEl.addEventListener('click', closeRequestModal);
+
+    requestModalEl.addEventListener('click', (event) => {
+      if (event.target === requestModalEl) closeRequestModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && requestModalEl.style.display === 'flex') {
+        closeRequestModal();
+      }
+    });
+
+    loadBooks();
+  </script>
 </body>
 </html>
