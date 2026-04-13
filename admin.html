@@ -464,7 +464,6 @@
           <td>
             <select onchange="updateRequestStatus('${request.id}', this.value)">
               <option value="Pending" ${request.status === 'Pending' ? 'selected' : ''}>Pending</option>
-              <option value="Approved" ${request.status === 'Approved' ? 'selected' : ''}>Approved</option>
               <option value="Done" ${request.status === 'Done' ? 'selected' : ''}>Done</option>
               <option value="Returned" ${request.status === 'Returned' ? 'selected' : ''}>Returned</option>
               <option value="Rejected" ${request.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
