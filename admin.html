@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --success: #059669;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 24px 16px;
+    }
+
+    .header-inner,
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .container {
+      padding: 20px 16px 40px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 200px auto auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      border: 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .status-text {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .error-text { color: var(--danger); }
+    .success-text { color: var(--success); }
+    .hidden { display: none !important; }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f9fafb;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .badge.pending { background: #eff6ff; color: #2563eb; }
+    .badge.approved { background: #fef3c7; color: #b45309; }
+    .badge.done { background: #fee2e2; color: #b91c1c; }
+    .badge.returned { background: #ecfdf5; color: #047857; }
+    .badge.rejected { background: #f3f4f6; color: #4b5563; }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .form-grid,
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Admin Dashboard</h1>
+      <p class="subtitle">Manage borrowing requests.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="authCard" class="card">
+      <h2>Admin Login</h2>
+
+      <form id="loginForm">
+        <div class="form-grid">
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" autocomplete="username" required />
+          </div>
+
+          <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" autocomplete="current-password" required />
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <button type="submit" class="btn btn-primary" id="loginBtn">Log In</button>
+        </div>
+      </form>
+
+      <div id="authStatus" class="status-text"></div>
+    </section>
+
+    <section id="dashboardCard" class="card hidden">
+      <div class="top-row">
+        <div>
+          <h2 style="margin:0;">Requests</h2>
+          <div id="sessionInfo" class="status-text" style="margin-top:6px;"></div>
+        </div>
+
+        <button id="logoutBtn" class="btn btn-danger">Log Out</button>
+      </div>
+
+      <div class="toolbar" style="margin-bottom:16px;">
+        <input type="text" id="searchInput" placeholder="Search by book, requester, contact, message, or book id" />
+
+        <select id="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Done">Done</option>
+          <option value="Returned">Returned</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+
+        <button id="refreshBtn" class="btn btn-secondary">Refresh</button>
+        <button id="reloadSessionBtn" class="btn btn-secondary">Check Session</button>
+      </div>
+
+      <div id="requestStatus" class="status-text">Loading requests...</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Created</th>
+              <th>Book</th>
+              <th>Book ID</th>
+              <th>Requester</th>
+              <th>Contact</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="requestsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://yhpxfcoqoobpcmksuhso.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlocHhmY29xb29icGNta3N1aHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMDA2MjMsImV4cCI6MjA5MTU3NjYyM30.qvnqyFov5VfItaCtLYwPae5wEcU9rIJROrifglKwaPA';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allRequests = [];
+
+    const authCardEl = document.getElementById('authCard');
+    const dashboardCardEl = document.getElementById('dashboardCard');
+    const loginFormEl = document.getElementById('loginForm');
+    const loginBtnEl = document.getElementById('loginBtn');
+    const logoutBtnEl = document.getElementById('logoutBtn');
+    const authStatusEl = document.getElementById('authStatus');
+    const sessionInfoEl = document.getElementById('sessionInfo');
+    const requestStatusEl = document.getElementById('requestStatus');
+    const requestsTableBodyEl = document.getElementById('requestsTableBody');
+    const searchInputEl = document.getElementById('searchInput');
+    const statusFilterEl = document.getElementById('statusFilter');
+    const refreshBtnEl = document.getElementById('refreshBtn');
+    const reloadSessionBtnEl = document.getElementById('reloadSessionBtn');
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
+
+    function statusBadge(status) {
+      const normalized = String(status || '').toLowerCase();
+      return `<span class="badge ${normalized}">${escapeHtml(status || '')}</span>`;
+    }
+
+    function setAuthMessage(message, type = '') {
+      authStatusEl.textContent = message;
+      authStatusEl.className = 'status-text';
+      if (type === 'error') authStatusEl.classList.add('error-text');
+      if (type === 'success') authStatusEl.classList.add('success-text');
+    }
+
+    function setRequestMessage(message, type = '') {
+      requestStatusEl.textContent = message;
+      requestStatusEl.className = 'status-text';
+      if (type === 'error') requestStatusEl.classList.add('error-text');
+      if (type === 'success') requestStatusEl.classList.add('success-text');
+    }
+
+    async function login(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        setAuthMessage('Please enter email and password.', 'error');
+        return;
+      }
+
+      loginBtnEl.disabled = true;
+      loginBtnEl.textContent = 'Logging in...';
+      setAuthMessage('');
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          console.error('Login error:', error);
+          setAuthMessage(error.message || 'Login failed.', 'error');
+          return;
+        }
+
+        setAuthMessage('Login successful.', 'success');
+        await initializeAdminView();
+      } catch (err) {
+        console.error('Unexpected login error:', err);
+        setAuthMessage('Login failed.', 'error');
+      } finally {
+        loginBtnEl.disabled = false;
+        loginBtnEl.textContent = 'Log In';
+      }
+    }
+
+    async function logout() {
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+
+      authCardEl.classList.remove('hidden');
+      dashboardCardEl.classList.add('hidden');
+      setAuthMessage('Logged out.', 'success');
+      sessionInfoEl.textContent = '';
+      allRequests = [];
+      requestsTableBodyEl.innerHTML = '';
+    }
+
+    async function initializeAdminView() {
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error('Session error:', error);
+        authCardEl.classList.remove('hidden');
+        dashboardCardEl.classList.add('hidden');
+        setAuthMessage('Unable to read session.', 'error');
+        return;
+      }
+
+      const session = data?.session;
+
+      if (!session?.user) {
+        authCardEl.classList.remove('hidden');
+        dashboardCardEl.classList.add('hidden');
+        return;
+      }
+
+      authCardEl.classList.add('hidden');
+      dashboardCardEl.classList.remove('hidden');
+      sessionInfoEl.textContent = `Signed in as ${session.user.email}`;
+      await loadRequests();
+    }
+
+    async function loadRequests() {
+      setRequestMessage('Loading requests...');
+      requestsTableBodyEl.innerHTML = '';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('requests')
+          .select('id, book_id, book_title, requester_name, contact, message, status, created_at')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Load requests error:', error);
+          setRequestMessage(error.message || 'Failed to load requests.', 'error');
+          return;
+        }
+
+        allRequests = Array.isArray(data) ? data : [];
+        renderFilteredRequests();
+      } catch (err) {
+        console.error('Unexpected load error:', err);
+        setRequestMessage('Failed to load requests.', 'error');
+      }
+    }
+
+    function renderFilteredRequests() {
+      const search = searchInputEl.value.trim().toLowerCase();
+      const statusFilter = statusFilterEl.value;
+
+      const filtered = allRequests.filter(row => {
+        const haystack = [
+          row.book_title,
+          row.book_id,
+          row.requester_name,
+          row.contact,
+          row.message,
+          row.status
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = !search || haystack.includes(search);
+        const matchesStatus = statusFilter === 'all' || row.status === statusFilter;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      requestsTableBodyEl.innerHTML = filtered.map(renderRequestRow).join('');
+      setRequestMessage(`Showing ${filtered.length} of ${allRequests.length} requests`);
+    }
+
+    function renderRequestRow(request) {
+      return `
+        <tr>
+          <td>${escapeHtml(formatDate(request.created_at))}</td>
+          <td>${escapeHtml(request.book_title || '')}</td>
+          <td>${escapeHtml(request.book_id || '')}</td>
+          <td>${escapeHtml(request.requester_name || '')}</td>
+          <td>${escapeHtml(request.contact || '')}</td>
+          <td>${escapeHtml(request.message || '')}</td>
+          <td>${statusBadge(request.status)}</td>
+          <td>
+            <select onchange="updateRequestStatus('${request.id}', this.value)">
+              <option value="Pending" ${request.status === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option value="Approved" ${request.status === 'Approved' ? 'selected' : ''}>Approved</option>
+              <option value="Done" ${request.status === 'Done' ? 'selected' : ''}>Done</option>
+              <option value="Returned" ${request.status === 'Returned' ? 'selected' : ''}>Returned</option>
+              <option value="Rejected" ${request.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+            </select>
+          </td>
+        </tr>
+      `;
+    }
+
+    async function updateRequestStatus(requestId, newStatus) {
+      if (!requestId || !newStatus) {
+        alert('Invalid update request.');
+        return;
+      }
+
+      try {
+        if (newStatus === 'Done') {
+          const { data: requestRow, error: requestError } = await supabaseClient
+            .from('requests')
+            .select('id, book_id, status')
+            .eq('id', requestId)
+            .single();
+
+          if (requestError || !requestRow) {
+            console.error(requestError);
+            alert('Failed to load request details.');
+            await loadRequests();
+            return;
+          }
+
+          if (!requestRow.book_id) {
+            alert('This request has no book_id. It cannot safely be marked as Done.');
+            await loadRequests();
+            return;
+          }
+
+          const { data: existingDone, error: existingDoneError } = await supabaseClient
+            .from('requests')
+            .select('id')
+            .eq('book_id', requestRow.book_id)
+            .eq('status', 'Done')
+            .neq('id', requestId)
+            .limit(1);
+
+          if (existingDoneError) {
+            console.error(existingDoneError);
+            alert('Failed to validate borrow state.');
+            await loadRequests();
+            return;
+          }
+
+          if (existingDone && existingDone.length > 0) {
+            alert('This book is already marked as borrowed by another request.');
+            await loadRequests();
+            return;
+          }
+        }
+
+        const { error: updateError } = await supabaseClient
+          .from('requests')
+          .update({ status: newStatus })
+          .eq('id', requestId);
+
+        if (updateError) {
+          console.error('Update error:', updateError);
+
+          if (
+            String(updateError.message || '').toLowerCase().includes('duplicate key') ||
+            String(updateError.message || '').toLowerCase().includes('unique')
+          ) {
+            alert('This book already has another Done request.');
+          } else {
+            alert(updateError.message || 'Failed to update status.');
+          }
+
+          await loadRequests();
+          return;
+        }
+
+        setRequestMessage(`Request updated to ${newStatus}.`, 'success');
+        await loadRequests();
+      } catch (err) {
+        console.error('Unexpected update error:', err);
+        alert('Failed to update status.');
+        await loadRequests();
+      }
+    }
+
+    loginFormEl.addEventListener('submit', login);
+    logoutBtnEl.addEventListener('click', logout);
+    refreshBtnEl.addEventListener('click', loadRequests);
+    reloadSessionBtnEl.addEventListener('click', initializeAdminView);
+    searchInputEl.addEventListener('input', renderFilteredRequests);
+    statusFilterEl.addEventListener('change', renderFilteredRequests);
+
+    supabaseClient.auth.onAuthStateChange(() => {
+      initializeAdminView();
+    });
+
+    initializeAdminView();
+  </script>
+</body>
+</html>
