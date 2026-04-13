@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artyom's Comic Library</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --success: #059669;
+      --warning: #b45309;
+      --accent: #f59e0b;
+      --accent-soft: #fef3c7;
+      --blue-soft: #dbeafe;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 24px 16px;
+    }
+
+    .header-inner,
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin: 24px 0 20px;
+      align-items: stretch;
+    }
+
+    .hero-text,
+    .hero-side,
+    .feature-card,
+    .step-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-text {
+      padding: 24px;
+    }
+
+    .hero-kicker {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .hero h2 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 18px;
+      color: #4b5563;
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 640px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-btn {
+      text-decoration: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+      display: inline-block;
+    }
+
+    .hero-btn.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .hero-btn.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .hero-side {
+      padding: 20px;
+    }
+
+    .mini-badge {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #92400e;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .hero-side p {
+      margin: 10px 0;
+      color: #374151;
+    }
+
+    .library-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0 14px;
+    }
+
+    .summary-pill {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .summary-pill strong {
+      font-size: 15px;
+      color: #111827;
+    }
+
+    .feature-section,
+    .how-it-works {
+      margin: 22px 0;
+    }
+
+    .feature-section h3,
+    .how-it-works h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .feature-grid,
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .feature-card,
+    .step-card {
+      padding: 18px;
+    }
+
+    .feature-card h4,
+    .step-card h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .feature-card p,
+    .step-card p {
+      margin: 0;
+      color: #4b5563;
+      line-height: 1.4;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 12px;
+      margin: 14px 0 18px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .status-line {
+      margin: 10px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .warning-line {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: var(--warning);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+      padding-bottom: 28px;
+    }
+
+    .book-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .book-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
+    }
+
+    .book-image-wrap {
+      background: #f3f4f6;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .book-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .book-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .book-meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .book-notes {
+      margin: 0;
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .book-status {
+      display: inline-block;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .book-status.available {
+      background: #ecfdf5;
+      color: var(--success);
+    }
+
+    .book-status.borrowed {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .request-btn {
+      margin-top: auto;
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .request-btn:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .request-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .empty-state,
+    .error-state {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-backdrop,
+    .success-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .success-backdrop {
+      z-index: 1100;
+    }
+
+    .modal,
+    .success-modal {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .success-modal {
+      max-width: 420px;
+      text-align: center;
+      padding: 24px 20px;
+    }
+
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #ecfdf5;
+      color: #059669;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .success-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .success-text {
+      margin: 0;
+      color: #4b5563;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: 16px 18px;
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 0;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .helper {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .modal-request-feedback {
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .modal-request-feedback.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .modal-request-feedback.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .site-footer {
+      text-align: center;
+      padding: 8px 16px 40px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .feature-grid,
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h2 {
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Artyom's Comic Library</h1>
+      <p class="subtitle">Browse the collection and submit a borrowing request.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-text">
+        <p class="hero-kicker">📚 Welcome to</p>
+        <h2>Artyom’s Comic Library</h2>
+        <p class="hero-subtitle">
+          A fun place to explore cool comics, pick favourites, and borrow stories for the next adventure.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#comic-section" class="hero-btn primary">Browse Comics</a>
+          <a href="#top-picks" class="hero-btn secondary">Top Picks</a>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="mini-badge">⭐ Library Boss</div>
+        <p><strong>Owner:</strong> Artyom</p>
+        <p><strong>Mission:</strong> Share awesome comics with friends</p>
+        <p><strong>Type:</strong> Super comic collection</p>
+      </div>
+    </section>
+
+    <section class="library-summary">
+      <div class="summary-pill"><strong id="statTotalBooks">0</strong> books</div>
+      <div class="summary-pill"><strong id="statTotalSeries">0</strong> series</div>
+      <div class="summary-pill"><strong id="statAvailableBooks">0</strong> available</div>
+      <div class="summary-pill"><strong id="statBorrowedBooks">0</strong> borrowed</div>
+    </section>
+
+    <section id="top-picks" class="feature-section">
+      <h3>⭐ Top Picks by Artyom</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>🚀 Best Adventure</h4>
+          <p>Naruto Starter</p>
+        </div>
+        <div class="feature-card">
+          <h4>🦸 Coolest Hero</h4>
+          <p>Spider-Man Vol.1</p>
+        </div>
+        <div class="feature-card">
+          <h4>😂 Funniest Pick</h4>
+          <p>Doraemon Fun Day</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <h3>🎯 How it works</h3>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4>Pick a Comic</h4>
+          <p>Look through the collection and choose a comic you like.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4>Send a Request</h4>
+          <p>Ask to borrow it using the request button.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4>Read and Enjoy</h4>
+          <p>Once the book is handed over, it becomes borrowed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="comic-section">
+      <div class="toolbar">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by title, series, notes, location, age or id"
+        />
+        <select id="statusFilter">
+          <option value="all">All books</option>
+          <option value="available">Available</option>
+          <option value="borrowed">Borrowed</option>
+        </select>
+      </div>
+
+      <p id="statusLine" class="status-line">Loading books...</p>
+      <p id="warningLine" class="warning-line hidden"></p>
+
+      <div id="errorState" class="error-state hidden"></div>
+      <div id="emptyState" class="empty-state hidden">No books found.</div>
+      <div id="bookList" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Powered by Artyom 🚀</p>
+  </footer>
+
+  <div id="requestModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
+      <div class="modal-header">
+        <h2 id="requestModalTitle" style="margin:0; font-size:20px;">Request Book</h2>
+        <p id="requestBookTitle" style="margin:8px 0 0; color:#111827; font-weight:700;"></p>
+        <p id="requestBookMeta" style="margin:6px 0 0; color:#6b7280; font-size:14px;"></p>
+      </div>
+
+      <form id="requestForm">
+        <div class="modal-body">
+          <div id="modalRequestFeedback" class="modal-request-feedback hidden"></div>
+
+          <div style="display:grid; gap:12px;">
+            <div>
+              <label for="requester_name">Your name</label>
+              <input type="text" id="requester_name" name="requester_name" required />
+            </div>
+
+            <div>
+              <label for="contact">Contact</label>
+              <input type="text" id="contact" name="contact" required placeholder="Email or phone" />
+            </div>
+
+            <div>
+              <label for="message">Message</label>
+              <textarea id="message" name="message" placeholder="Optional note"></textarea>
+              <div class="helper">Your request will be reviewed by the admin.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelRequestBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitRequestBtn">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="successPopup" class="success-backdrop" aria-hidden="true">
+    <div class="success-modal">
+      <div class="success-icon">✓</div>
+      <h3 class="success-title">Request sent</h3>
+      <p id="successPopupText" class="success-text"></p>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://yhpxfcoqoobpcmksuhso.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlocHhmY29xb29icGNta3N1aHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMDA2MjMsImV4cCI6MjA5MTU3NjYyM30.qvnqyFov5VfItaCtLYwPae5wEcU9rIJROrifglKwaPA";
+
+    if (!SUPABASE_URL.startsWith('http')) {
+      throw new Error('Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.');
+    }
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allBooks = [];
+    let selectedBookId = '';
+    let selectedBookTitle = '';
+
+    const bookListEl = document.getElementById('bookList');
+    const emptyStateEl = document.getElementById('emptyState');
+    const errorStateEl = document.getElementById('errorState');
+    const statusLineEl = document.getElementById('statusLine');
+    const warningLineEl = document.getElementById('warningLine');
+    const statTotalBooksEl = document.getElementById('statTotalBooks');
+    const statTotalSeriesEl = document.getElementById('statTotalSeries');
+    const statAvailableBooksEl = document.getElementById('statAvailableBooks');
+    const statBorrowedBooksEl = document.getElementById('statBorrowedBooks');
+    const searchInputEl = document.getElementById('searchInput');
+    const statusFilterEl = document.getElementById('statusFilter');
+    const requestModalEl = document.getElementById('requestModal');
+    const requestBookTitleEl = document.getElementById('requestBookTitle');
+    const requestBookMetaEl = document.getElementById('requestBookMeta');
+    const requestFormEl = document.getElementById('requestForm');
+    const submitRequestBtnEl = document.getElementById('submitRequestBtn');
+    const cancelRequestBtnEl = document.getElementById('cancelRequestBtn');
+    const modalRequestFeedbackEl = document.getElementById('modalRequestFeedback');
+    const successPopupEl = document.getElementById('successPopup');
+    const successPopupTextEl = document.getElementById('successPopupText');
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function escapeJs(value) {
+      return String(value ?? '')
+        .replaceAll('\\', '\\\\')
+        .replaceAll("'", "\\'");
+    }
+
+    function normalizeBookRow(row) {
+      return {
+        id: String(row.id ?? '').trim(),
+        title: String(row.title ?? '').trim(),
+        series: String(row.series ?? '').trim(),
+        volume: String(row.volume ?? '').trim(),
+        notes: String(row.notes ?? '').trim(),
+        age: String(row.age ?? '').trim(),
+        image: String(row.image ?? '').trim(),
+        location: String(row.location ?? '').trim()
+      };
+    }
+
+    function updateLibraryStats(books) {
+      const totalBooks = books.length;
+      const uniqueSeries = new Set(
+        books.map(book => String(book.series || '').trim()).filter(Boolean)
+      );
+      const availableBooks = books.filter(book => book.availability === 'Available').length;
+      const borrowedBooks = books.filter(book => book.availability === 'Borrowed').length;
+
+      statTotalBooksEl.textContent = totalBooks;
+      statTotalSeriesEl.textContent = uniqueSeries.size;
+      statAvailableBooksEl.textContent = availableBooks;
+      statBorrowedBooksEl.textContent = borrowedBooks;
+    }
+
+    function showModalRequestFeedback(message, type = 'success') {
+      modalRequestFeedbackEl.textContent = message;
+      modalRequestFeedbackEl.className = `modal-request-feedback ${type}`;
+      modalRequestFeedbackEl.classList.remove('hidden');
+    }
+
+    function clearModalRequestFeedback() {
+      modalRequestFeedbackEl.textContent = '';
+      modalRequestFeedbackEl.className = 'modal-request-feedback hidden';
+    }
+
+    function showSuccessPopup(message) {
+      successPopupTextEl.textContent = message;
+      successPopupEl.style.display = 'flex';
+      successPopupEl.setAttribute('aria-hidden', 'false');
+
+      setTimeout(() => {
+        successPopupEl.style.display = 'none';
+        successPopupEl.setAttribute('aria-hidden', 'true');
+      }, 2200);
+    }
+
+    async function fetchBorrowedBookIdsSafe() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('requests')
+          .select('book_id')
+          .eq('status', 'Done');
+
+        if (error) {
+          console.warn('Borrowed-state fetch failed:', error);
+          warningLineEl.textContent = 'Books loaded, but live borrowed status is unavailable right now.';
+          warningLineEl.classList.remove('hidden');
+          return new Set();
+        }
+
+        warningLineEl.classList.add('hidden');
+        warningLineEl.textContent = '';
+
+        return new Set(
+          (data || [])
+            .map(row => String(row.book_id || '').trim())
+            .filter(Boolean)
+        );
+      } catch (err) {
+        console.warn('Borrowed-state fetch failed:', err);
+        warningLineEl.textContent = 'Books loaded, but live borrowed status is unavailable right now.';
+        warningLineEl.classList.remove('hidden');
+        return new Set();
+      }
+    }
+
+    function parseBooksCsv() {
+      return new Promise((resolve, reject) => {
+        Papa.parse('books.csv', {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: resolve,
+          error: reject
+        });
+      });
+    }
+
+    async function loadBooks() {
+      statusLineEl.textContent = 'Loading books...';
+      errorStateEl.classList.add('hidden');
+      emptyStateEl.classList.add('hidden');
+      bookListEl.innerHTML = '';
+
+      try {
+        const [borrowedBookIds, results] = await Promise.all([
+          fetchBorrowedBookIdsSafe(),
+          parseBooksCsv()
+        ]);
+
+        const rows = Array.isArray(results.data) ? results.data : [];
+
+        allBooks = rows
+          .map(normalizeBookRow)
+          .filter(book => book.id && book.title)
+          .map(book => ({
+            ...book,
+            availability: borrowedBookIds.has(book.id) ? 'Borrowed' : 'Available'
+          }));
+
+        updateLibraryStats(allBooks);
+        renderFilteredBooks();
+      } catch (err) {
+        console.error('Load error:', err);
+        errorStateEl.textContent = 'Failed to load books.csv. Check that books.csv exists in the same folder as index.html and has headers: id,title,series,volume,notes,age,image,location';
+        errorStateEl.classList.remove('hidden');
+        statusLineEl.textContent = 'Error';
+      }
+    }
+
+    function renderFilteredBooks() {
+      const search = searchInputEl.value.trim().toLowerCase();
+      const filter = statusFilterEl.value;
+
+      const filtered = allBooks.filter(book => {
+        const haystack = [
+          book.id,
+          book.title,
+          book.series,
+          book.volume,
+          book.notes,
+          book.age,
+          book.location
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = !search || haystack.includes(search);
+        const matchesFilter =
+          filter === 'all' ||
+          (filter === 'available' && book.availability === 'Available') ||
+          (filter === 'borrowed' && book.availability === 'Borrowed');
+
+        return matchesSearch && matchesFilter;
+      });
+
+      renderBooks(filtered, allBooks.length);
+    }
+
+    function renderBooks(books, totalCount) {
+      bookListEl.innerHTML = '';
+      errorStateEl.classList.add('hidden');
+
+      if (!allBooks.length) {
+        statusLineEl.textContent = 'No books loaded.';
+        emptyStateEl.classList.remove('hidden');
+        return;
+      }
+
+      statusLineEl.textContent = `Showing ${books.length} of ${totalCount} books`;
+      emptyStateEl.classList.toggle('hidden', books.length > 0);
+
+      if (!books.length) return;
+
+      bookListEl.innerHTML = books.map(renderBookCard).join('');
+    }
+
+    function renderBookCard(book) {
+      const isBorrowed = book.availability === 'Borrowed';
+      const imageSrc = book.image || '';
+
+      return `
+        <div class="book-card">
+          <div class="book-image-wrap">
+            ${
+              imageSrc
+                ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(book.title)}" loading="lazy" />`
+                : `<div style="padding:16px; color:#6b7280;">No image</div>`
+            }
+          </div>
+
+          <div class="book-body">
+            <h3 class="book-title">${escapeHtml(book.title)}</h3>
+            <p class="book-meta">Series: ${escapeHtml(book.series || '-')}</p>
+            <p class="book-meta">Volume: ${escapeHtml(book.volume || '-')}</p>
+            <p class="book-meta">Age: ${escapeHtml(book.age || '-')}</p>
+            <p class="book-meta">Location: ${escapeHtml(book.location || '-')}</p>
+            <p class="book-meta">ID: ${escapeHtml(book.id)}</p>
+            ${book.notes ? `<p class="book-notes">${escapeHtml(book.notes)}</p>` : ''}
+
+            <span class="book-status ${isBorrowed ? 'borrowed' : 'available'}">
+              ${escapeHtml(book.availability)}
+            </span>
+
+            <button
+              class="request-btn"
+              ${isBorrowed ? 'disabled' : ''}
+              onclick="openRequestModal('${escapeJs(book.id)}', '${escapeJs(book.title)}')"
+            >
+              ${isBorrowed ? 'Unavailable' : 'Request'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function openRequestModal(bookId, bookTitle) {
+      selectedBookId = String(bookId || '').trim();
+      selectedBookTitle = String(bookTitle || '').trim();
+
+      if (!selectedBookId || !selectedBookTitle) return;
+
+      clearModalRequestFeedback();
+      requestBookTitleEl.textContent = selectedBookTitle;
+      requestBookMetaEl.textContent = `Book ID: ${selectedBookId}`;
+      requestModalEl.style.display = 'flex';
+      requestModalEl.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeRequestModal() {
+      requestFormEl.reset();
+      selectedBookId = '';
+      selectedBookTitle = '';
+      requestBookTitleEl.textContent = '';
+      requestBookMetaEl.textContent = '';
+      clearModalRequestFeedback();
+      requestModalEl.style.display = 'none';
+      requestModalEl.setAttribute('aria-hidden', 'true');
+    }
+
+    async function submitRequest(event) {
+      event.preventDefault();
+
+      const requesterName = document.getElementById('requester_name').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      clearModalRequestFeedback();
+
+      if (!selectedBookId || !selectedBookTitle) {
+        showModalRequestFeedback('No book selected.', 'error');
+        return;
+      }
+
+      if (!requesterName || !contact) {
+        showModalRequestFeedback('Please complete all required fields.', 'error');
+        return;
+      }
+
+      submitRequestBtnEl.disabled = true;
+      submitRequestBtnEl.textContent = 'Sending...';
+
+      try {
+        const { error } = await supabaseClient.rpc('submit_request', {
+          p_book_id: selectedBookId,
+          p_book_title: selectedBookTitle,
+          p_requester_name: requesterName,
+          p_contact: contact,
+          p_message: message
+        });
+
+        if (error) {
+          console.error('RPC error:', error);
+          showModalRequestFeedback('Could not send your request. Please try again.', 'error');
+          submitRequestBtnEl.disabled = false;
+          submitRequestBtnEl.textContent = 'Submit Request';
+          return;
+        }
+
+        const sentTitle = selectedBookTitle;
+        showModalRequestFeedback('Request sent successfully to Artyom’s Library.', 'success');
+
+        setTimeout(() => {
+          closeRequestModal();
+          showSuccessPopup(`Thanks for your request. "${sentTitle}" was sent to Artyom’s Library.`);
+          submitRequestBtnEl.disabled = false;
+          submitRequestBtnEl.textContent = 'Submit Request';
+        }, 900);
+
+      } catch (err) {
+        console.error('Unexpected submit error:', err);
+        showModalRequestFeedback('Could not send your request. Please try again.', 'error');
+        submitRequestBtnEl.disabled = false;
+        submitRequestBtnEl.textContent = 'Submit Request';
+      }
+    }
+
+    searchInputEl.addEventListener('input', renderFilteredBooks);
+    statusFilterEl.addEventListener('change', renderFilteredBooks);
+    requestFormEl.addEventListener('submit', submitRequest);
+    cancelRequestBtnEl.addEventListener('click', closeRequestModal);
+
+    requestModalEl.addEventListener('click', (event) => {
+      if (event.target === requestModalEl) closeRequestModal();
+    });
+
+    successPopupEl.addEventListener('click', (event) => {
+      if (event.target === successPopupEl) {
+        successPopupEl.style.display = 'none';
+        successPopupEl.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && requestModalEl.style.display === 'flex') {
+        closeRequestModal();
+      }
+      if (event.key === 'Escape' && successPopupEl.style.display === 'flex') {
+        successPopupEl.style.display = 'none';
+        successPopupEl.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    loadBooks();
+  </script>
+</body>
+</html>
