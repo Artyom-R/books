@@ -1,4 +1,4 @@
-id,title,author,volume,notes,age,image
+id,title,series,volume,notes,age,image
 B007,Ghost Book,Remy Lai,1,Adventure with ghosts and magical world,8+,images/ghostbook.jpg
 B008,The Amazing Voyage,Geronimo Stilton Kingdom of Fantasy,3,Fantasy journey with puzzles and adventures,7+,images/kof3.jpg
 B009,The Kingdom of Fantasy,Geronimo Stilton Kingdom of Fantasy,1,First magical adventure in fantasy world,7+,images/kof1.jpg
