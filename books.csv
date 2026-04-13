@@ -1,7 +1,7 @@
-title,series,volume,status,notes,image,age,location
-Spider-Man Vol.1,Marvel,1,Available,Funny comic with lots of action,images/spiderman.jpg,7+,Blue Shelf
-Batman Begins,DC,2,Borrowed,Dark hero story and cool gadgets,images/batman.jpg,8+,Top Shelf
-Pokemon Adventure,Pokemon,3,Available,Great for kids who love Pokemon,images/pokemon.jpg,6+,Green Box
-Avengers Team-Up,Marvel,4,Available,Big team battle and easy reading,images/avengers.jpg,8+,Blue Shelf
-Doraemon Fun Day,Kodansha,5,Borrowed,Light and funny story,images/doraemon.jpg,6+,Red Basket
-Naruto Starter,Shonen,1,Available,Adventure and ninja action,images/naruto.jpg,9+,Top Shelf
+id,title,series,volume,status,notes,age,image,location
+B001,Spider-Man Vol.1,Marvel,1,Available,Funny comic with lots of action,8+,images/spiderman.jpg,Blue Shelf
+B002,Batman Begins,DC,2,Borrowed,Dark hero story and cool gadgets,8+,images/batman.jpg,Top Shelf
+B003,Pokemon Adventure,Pokemon,3,Available,Great for kids who love Pokemon,6+,images/pokemon.jpg,Green Box
+B004,Avengers Team-Up,Marvel,4,Available,Big team battle and easy reading,9+,images/avengers.jpg,Blue Shelf
+B005,Doraemon Fun Day,Kodansha,5,Borrowed,Light and funny story,6+,images/doraemon.jpg,Red Basket
+B006,Naruto Starter,Shonen,1,Available,Adventure and ninja action,7+,images/naruto.jpg,Top Shelf
