@@ -564,7 +564,7 @@
 
     <section class="library-summary">
       <div class="summary-pill"><strong id="statTotalBooks">0</strong> books</div>
-      <div class="summary-pill"><strong id="statTotalSeries">0</strong> series</div>
+      <div class="summary-pill"><strong id="statTotalSeries">0</strong> author</div>
       <div class="summary-pill"><strong id="statAvailableBooks">0</strong> available</div>
       <div class="summary-pill"><strong id="statBorrowedBooks">0</strong> borrowed</div>
     </section>
@@ -613,7 +613,7 @@
         <input
           type="text"
           id="searchInput"
-          placeholder="Search by title, series, notes, location, age or id"
+          placeholder="Search by title, author, notes, location, age or id"
         />
         <select id="statusFilter">
           <option value="all">All books</option>
@@ -736,7 +736,7 @@
       return {
         id: String(row.id ?? '').trim(),
         title: String(row.title ?? '').trim(),
-        series: String(row.series ?? '').trim(),
+        author: String(row.author ?? '').trim(),
         volume: String(row.volume ?? '').trim(),
         notes: String(row.notes ?? '').trim(),
         age: String(row.age ?? '').trim(),
@@ -748,7 +748,7 @@
     function updateLibraryStats(books) {
       const totalBooks = books.length;
       const uniqueSeries = new Set(
-        books.map(book => String(book.series || '').trim()).filter(Boolean)
+        books.map(book => String(book.author || '').trim()).filter(Boolean)
       );
       const availableBooks = books.filter(book => book.availability === 'Available').length;
       const borrowedBooks = books.filter(book => book.availability === 'Borrowed').length;
@@ -849,7 +849,7 @@
         renderFilteredBooks();
       } catch (err) {
         console.error('Load error:', err);
-        errorStateEl.textContent = 'Failed to load books.csv. Check that books.csv exists in the same folder as index.html and has headers: id,title,series,volume,notes,age,image,location';
+        errorStateEl.textContent = 'Failed to load books.csv. Check that books.csv exists in the same folder as index.html and has headers: id,title,author,volume,notes,age,image,location';
         errorStateEl.classList.remove('hidden');
         statusLineEl.textContent = 'Error';
       }
@@ -863,7 +863,7 @@
         const haystack = [
           book.id,
           book.title,
-          book.series,
+          book.author,
           book.volume,
           book.notes,
           book.age,
@@ -916,7 +916,7 @@
 
           <div class="book-body">
             <h3 class="book-title">${escapeHtml(book.title)}</h3>
-            <p class="book-meta">Series: ${escapeHtml(book.series || '-')}</p>
+            <p class="book-meta">author: ${escapeHtml(book.author || '-')}</p>
             <p class="book-meta">Volume: ${escapeHtml(book.volume || '-')}</p>
             <p class="book-meta">Age: ${escapeHtml(book.age || '-')}</p>
             <p class="book-meta">Location: ${escapeHtml(book.location || '-')}</p>
