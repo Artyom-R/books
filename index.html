@@ -613,7 +613,7 @@
         <input
           type="text"
           id="searchInput"
-          placeholder="Search by title, author, notes, location, age or id"
+          placeholder="Search by title, author, notes, age or id"
         />
         <select id="statusFilter">
           <option value="all">All books</option>
@@ -741,7 +741,6 @@
         notes: String(row.notes ?? '').trim(),
         age: String(row.age ?? '').trim(),
         image: String(row.image ?? '').trim(),
-        location: String(row.location ?? '').trim()
       };
     }
 
@@ -849,7 +848,7 @@
         renderFilteredBooks();
       } catch (err) {
         console.error('Load error:', err);
-        errorStateEl.textContent = 'Failed to load books.csv. Check that books.csv exists in the same folder as index.html and has headers: id,title,author,volume,notes,age,image,location';
+        errorStateEl.textContent = 'Failed to load books.csv. Check that books.csv exists in the same folder as index.html and has headers: id,title,author,volume,notes,age,image';
         errorStateEl.classList.remove('hidden');
         statusLineEl.textContent = 'Error';
       }
@@ -866,8 +865,7 @@
           book.author,
           book.volume,
           book.notes,
-          book.age,
-          book.location
+          book.age,          
         ].join(' ').toLowerCase();
 
         const matchesSearch = !search || haystack.includes(search);
@@ -919,7 +917,6 @@
             <p class="book-meta">Author: ${escapeHtml(book.author || '-')}</p>
             <p class="book-meta">Volume: ${escapeHtml(book.volume || '-')}</p>
             <p class="book-meta">Age: ${escapeHtml(book.age || '-')}</p>
-            <p class="book-meta">Location: ${escapeHtml(book.location || '-')}</p>
             <p class="book-meta">ID: ${escapeHtml(book.id)}</p>
             ${book.notes ? `<p class="book-notes">${escapeHtml(book.notes)}</p>` : ''}
 
