@@ -1,49 +1,49 @@
-id,title,author,volume,notes,age,image
-B007,Ghost Book,Remy Lai,1,Adventure with ghosts and magical world,8+,images/ghostbook.jpg
-B008,The Amazing Voyage,Geronimo Stilton Kingdom of Fantasy,3,Fantasy journey with puzzles and adventures,7+,images/kof3.jpg
-B009,The Kingdom of Fantasy,Geronimo Stilton Kingdom of Fantasy,1,First magical adventure in fantasy world,7+,images/kof1.jpg
-B010,The Volcano of Fire,Geronimo Stilton Kingdom of Fantasy,5,Adventure through dangerous volcano lands,7+,images/kof5.jpg
-B011,The Wizard's Wand,Geronimo Stilton Kingdom of Fantasy,9,Quest to find a powerful magical wand,7+,images/kof9.jpg
-B012,The Ship of Secrets,Geronimo Stilton Kingdom of Fantasy,10,Sea adventure with mysteries and secrets,7+,images/kof10.jpg
-B013,The Island of Dragons,Geronimo Stilton Kingdom of Fantasy,12,Dragon island adventure and fantasy battles,7+,images/kof12.jpg
-B014,Ghost,Raina Telgemeier,1,Graphic novel about friendship and mystery,9+,images/ghost_raina.jpg
-B015,Guts,Raina Telgemeier,1,Story about anxiety and growing up,10+,images/guts.jpg
-B016,Sisters,Raina Telgemeier,1,Sibling relationship and family story,9+,images/sisters.jpg
-B017,Drama,Raina Telgemeier,1,School life and theater story,10+,images/drama.jpg
-B018,Smile,Raina Telgemeier,1,Coming-of-age story with humor,9+,images/smile.jpg
-B019,Pablo and Splash,Pablo and Splash,1,Fun underwater adventure with friendship themes,7+,images/pablo_splash_1.jpg
-B020,Frozen in Time,Pablo and Splash,2,Time-travel aquatic adventure,7+,images/pablo_splash_2.jpg
-B021,Roman Holiday,Pablo and Splash,3,Historical themed ocean journey,7+,images/pablo_splash_3.jpg
-B022,Pawcasso,Remy Lai,1,Creative and humorous story about art and pets,8+,images/pawcasso.jpg
-B023,Housecat Trouble,Housecat Trouble,1,Funny story about mischievous house cat,7+,images/housecat_trouble_1.jpg
-B024,Lost and Found,Housecat Trouble,2,Adventure about getting lost and finding home,7+,images/housecat_trouble_2.jpg
-B025,Chickenpox,Remy Lai,1,Humorous story about illness and school life,8+,images/chickenpox.jpg
-B026,Case Files,Investigators,9,Detective adventure with alligator agents,7+,images/investigators_9.jpg
-B027,Ant in Our P.A.N.T.S.,Investigators,4,Spy mystery with humor and gadgets,7+,images/investigators_4.jpg
-B028,Heist and Seek,Investigators,6,Action-packed heist investigation,7+,images/investigators_6.jpg
-B029,Off the Hook,Investigators,3,Ocean-themed detective story,7+,images/investigators_3.jpg
-B030,Braver and Boulder,Investigators,5,Adventure with courage and teamwork,7+,images/investigators_5.jpg
-B031,The Great Big Glitch,Bunny vs Monkey,10,Tech chaos and jungle comedy,7+,images/bunny_vs_monkey_10.jpg
-B032,The Impossible Pig,Bunny vs Monkey,8,Absurd and funny jungle story,7+,images/bunny_vs_monkey_8.jpg
-B033,Bunny vs Monkey,Bunny vs Monkey,1,First book of chaotic jungle rivalry,7+,images/bunny_vs_monkey_1.jpg
-B034,Multiverse Mix-Up,Bunny vs Monkey,7,Multiverse comedy adventure,7+,images/bunny_vs_monkey_7.jpg
-B035,Rise of the Maniacal Badger,Bunny vs Monkey,5,Villain rises in jungle madness,7+,images/bunny_vs_monkey_5.jpg
-B036,Machine Mayhem,Bunny vs Monkey,6,Tech-driven jungle chaos,7+,images/bunny_vs_monkey_6.jpg
-B037,Intergalactic Monkey Business,Bunny vs Monkey,11,Space-themed comedy adventure,7+,images/bunny_vs_monkey_11.jpg
-B038,Bunny Bonanza,Bunny vs Monkey,9,Wild jungle antics and humor,7+,images/bunny_vs_monkey_9.jpg
-B039,The Human Invasion,Bunny vs Monkey,2,Humans disrupt jungle life,7+,images/bunny_vs_monkey_2.jpg
-B040,The Supersonic Aye-Aye,Bunny vs Monkey,4,Fast-paced jungle adventure,7+,images/bunny_vs_monkey_4.jpg
-B041,Cyber-Thief Showdown,Geronimo Stilton,68,High-tech mystery adventure,7+,images/geronimo_stilton_68.jpg
-B042,Mighty Mount Kilimanjaro,Geronimo Stilton,41,Educational adventure to Africa,7+,images/geronimo_stilton_41.jpg
-B043,Kristy and the Walking Disaster,The Baby-Sitters Club,16,Friendship and responsibility story,9+,images/baby_sitters_club_16.jpg
-B044,All Tied Up,Investigators,7,Another detective mission with twists,7+,images/investigators_7.jpg
-B045,Take the Plunge,Investigators,2,Early underwater mystery adventure,7+,images/investigators_2.jpg
-B046,Investigators,Investigators,1,First detective adventure book,7+,images/investigators_1.jpg
-B047,Class Action,Investigators,8,School-based mystery case,7+,images/investigators_8.jpg
-B048,25 1/2 Anniversary Edition,Captain Underpants,13,Special anniversary comic adventure,8+,images/captain_underpants_13.jpg
-B049,The Revolting Revenge of the Radioactive Robo-Boxers,Captain Underpants,10,Action-packed comic chaos,8+,images/captain_underpants_10.jpg
-B050,The Sensational Saga of Sir Stinks-A-Lot,Captain Underpants,12,Humorous superhero nonsense,8+,images/captain_underpants_12.jpg
-B051,The Preposterous Plight of the Purple Potty People,Captain Underpants,8,Absurd and funny villain story,8+,images/captain_underpants_8.jpg
-B052,"The Big,Bad Battle of the Bionic Booger Boy Part 2: The Revenge of the Ridiculous Robo-Boogers",Captain Underpants,7,Gross-out humor and action,8+,images/captain_underpants_7.jpg
-B053,The Tyrannical Retaliation of the Turbo Toilet 2000,Captain Underpants,2,Classic silly superhero story,8+,images/captain_underpants_2.jpg
-B054,The Attack of the Talking Toilets,Captain Underpants,1,First book with iconic villains,8+,images/captain_underpants_1.jpg
+id,title,author,series,volume,notes,age,image
+B007,Ghost Book,Remy Lai,,1,Adventure with ghosts and magical world,8+,images/ghostbook.jpg
+B008,The Amazing Voyage,Geronimo Stilton,Kingdom of Fantasy,3,Fantasy journey with puzzles and adventures,7+,images/kof3.jpg
+B009,The Kingdom of Fantasy,Geronimo Stilton,Kingdom of Fantasy,1,First magical adventure in fantasy world,7+,images/kof1.jpg
+B010,The Volcano of Fire,Geronimo Stilton,Kingdom of Fantasy,5,Adventure through dangerous volcano lands,7+,images/kof5.jpg
+B011,The Wizard's Wand,Geronimo Stilton,Kingdom of Fantasy,9,Quest to find a powerful magical wand,7+,images/kof9.jpg
+B012,The Ship of Secrets,Geronimo Stilton,Kingdom of Fantasy,10,Sea adventure with mysteries and secrets,7+,images/kof10.jpg
+B013,The Island of Dragons,Geronimo Stilton,Kingdom of Fantasy,12,Dragon island adventure and fantasy battles,7+,images/kof12.jpg
+B014,Ghost,Raina Telgemeier,,1,Graphic novel about friendship and mystery,9+,images/ghost_raina.jpg
+B015,Guts,Raina Telgemeier,,1,Story about anxiety and growing up,10+,images/guts.jpg
+B016,Sisters,Raina Telgemeier,,1,Sibling relationship and family story,9+,images/sisters.jpg
+B017,Drama,Raina Telgemeier,,1,School life and theater story,10+,images/drama.jpg
+B018,Smile,Raina Telgemeier,,1,Coming-of-age story with humor,9+,images/smile.jpg
+B019,Pablo and Splash,Sheena Dempsey,Pablo and Splash,1,Fun underwater adventure with friendship themes,7+,images/pablo_splash_1.jpg
+B020,Frozen in Time,Sheena Dempsey,Pablo and Splash,2,Time-travel aquatic adventure,7+,images/pablo_splash_2.jpg
+B021,Roman Holiday,Sheena Dempsey,Pablo and Splash,3,Historical themed ocean journey,7+,images/pablo_splash_3.jpg
+B022,Pawcasso,Remy Lai,,1,Creative and humorous story about art and pets,8+,images/pawcasso.jpg
+B023,Housecat Trouble,Mason Dickerson,Housecat Trouble,1,Funny story about mischievous house cat,7+,images/housecat_trouble_1.jpg
+B024,Lost and Found,Mason Dickerson,Housecat Trouble,2,Adventure about getting lost and finding home,7+,images/housecat_trouble_2.jpg
+B025,Chickenpox,Remy Lai,,1,Humorous story about illness and school life,8+,images/chickenpox.jpg
+B026,Case Files,John Patrick Green,Investigators,9,Detective adventure with alligator agents,7+,images/investigators_9.jpg
+B027,Ant in Our P.A.N.T.S.,John Patrick Green,Investigators,4,Spy mystery with humor and gadgets,7+,images/investigators_4.jpg
+B028,Heist and Seek,John Patrick Green,Investigators,6,Action-packed heist investigation,7+,images/investigators_6.jpg
+B029,Off the Hook,John Patrick Green,Investigators,3,Ocean-themed detective story,7+,images/investigators_3.jpg
+B030,Braver and Boulder,John Patrick Green,Investigators,5,Adventure with courage and teamwork,7+,images/investigators_5.jpg
+B031,The Great Big Glitch,Jamie Smart,Bunny vs Monkey,10,Tech chaos and jungle comedy,7+,images/bunny_vs_monkey_10.jpg
+B032,The Impossible Pig,Jamie Smart,Bunny vs Monkey,8,Absurd and funny jungle story,7+,images/bunny_vs_monkey_8.jpg
+B033,Bunny vs Monkey,Jamie Smart,Bunny vs Monkey,1,First book of chaotic jungle rivalry,7+,images/bunny_vs_monkey_1.jpg
+B034,Multiverse Mix-Up,Jamie Smart,Bunny vs Monkey,7,Multiverse comedy adventure,7+,images/bunny_vs_monkey_7.jpg
+B035,Rise of the Maniacal Badger,Jamie Smart,Bunny vs Monkey,5,Villain rises in jungle madness,7+,images/bunny_vs_monkey_5.jpg
+B036,Machine Mayhem,Jamie Smart,Bunny vs Monkey,6,Tech-driven jungle chaos,7+,images/bunny_vs_monkey_6.jpg
+B037,Intergalactic Monkey Business,Jamie Smart,Bunny vs Monkey,11,Space-themed comedy adventure,7+,images/bunny_vs_monkey_11.jpg
+B038,Bunny Bonanza,Jamie Smart,Bunny vs Monkey,9,Wild jungle antics and humor,7+,images/bunny_vs_monkey_9.jpg
+B039,The Human Invasion,Jamie Smart,Bunny vs Monkey,2,Humans disrupt jungle life,7+,images/bunny_vs_monkey_2.jpg
+B040,The Supersonic Aye-Aye,Jamie Smart,Bunny vs Monkey,4,Fast-paced jungle adventure,7+,images/bunny_vs_monkey_4.jpg
+B041,Cyber-Thief Showdown,Geronimo Stilton,Geronimo Stilton,68,High-tech mystery adventure,7+,images/geronimo_stilton_68.jpg
+B042,Mighty Mount Kilimanjaro,Geronimo Stilton,Geronimo Stilton,41,Educational adventure to Africa,7+,images/geronimo_stilton_41.jpg
+B043,Kristy and the Walking Disaster,Ann M. Martin,The Baby-Sitters Club,16,Friendship and responsibility story,9+,images/baby_sitters_club_16.jpg
+B044,All Tied Up,John Patrick Green,Investigators,7,Another detective mission with twists,7+,images/investigators_7.jpg
+B045,Take the Plunge,John Patrick Green,Investigators,2,Early underwater mystery adventure,7+,images/investigators_2.jpg
+B046,Investigators,John Patrick Green,Investigators,1,First detective adventure book,7+,images/investigators_1.jpg
+B047,Class Action,John Patrick Green,Investigators,8,School-based mystery case,7+,images/investigators_8.jpg
+B048,25 1/2 Anniversary Edition,Dav Pilkey,Captain Underpants,13,Special anniversary comic adventure,8+,images/captain_underpants_13.jpg
+B049,The Revolting Revenge of the Radioactive Robo-Boxers,Dav Pilkey,Captain Underpants,10,Action-packed comic chaos,8+,images/captain_underpants_10.jpg
+B050,The Sensational Saga of Sir Stinks-A-Lot,Dav Pilkey,Captain Underpants,12,Humorous superhero nonsense,8+,images/captain_underpants_12.jpg
+B051,The Preposterous Plight of the Purple Potty People,Dav Pilkey,Captain Underpants,8,Absurd and funny villain story,8+,images/captain_underpants_8.jpg
+B052,"The Big,Bad Battle of the Bionic Booger Boy Part 2: The Revenge of the Ridiculous Robo-Boogers",Dav Pilkey,Captain Underpants,7,Gross-out humor and action,8+,images/captain_underpants_7.jpg
+B053,The Tyrannical Retaliation of the Turbo Toilet 2000,Dav Pilkey,Captain Underpants,2,Classic silly superhero story,8+,images/captain_underpants_2.jpg
+B054,The Attack of the Talking Toilets,Dav Pilkey,Captain Underpants,1,First book with iconic villains,8+,images/captain_underpants_1.jpg
