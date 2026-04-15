@@ -737,6 +737,7 @@
         id: String(row.id ?? '').trim(),
         title: String(row.title ?? '').trim(),
         author: String(row.author ?? '').trim(),
+        series: String(row.series ?? '').trim(),
         volume: String(row.volume ?? '').trim(),
         notes: String(row.notes ?? '').trim(),
         age: String(row.age ?? '').trim(),
@@ -914,9 +915,9 @@
 
           <div class="book-body">
             <h3 class="book-title">${escapeHtml(book.title)}</h3>
-            <p class="book-meta">Author: ${escapeHtml(book.author || '-')}</p>
-            <p class="book-meta">Volume: ${escapeHtml(book.volume || '-')}</p>
-            <p class="book-meta">Age: ${escapeHtml(book.age || '-')}</p>
+            ${book.author ? `<p class="book-meta">Author: ${escapeHtml(book.author)}</p>` : ''}
+            ${book.series ? `<p class="book-meta">${escapeHtml(book.series)} • Vol. ${escapeHtml(book.volume)}</p>` : ''}
+            ${book.age ? `<p class="book-meta">Age: ${escapeHtml(book.age)}</p>` : ''}
             <p class="book-meta">ID: ${escapeHtml(book.id)}</p>
             ${book.notes ? `<p class="book-notes">${escapeHtml(book.notes)}</p>` : ''}
 
